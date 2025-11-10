@@ -1,0 +1,36 @@
+# Tên của quy trình (hiển thị trên tab Actions của GitHub)
+name: Deploy code to Somee.com
+
+# Kích hoạt: Chạy quy trình này khi có ai đó 'push' (đẩy code)
+# lên nhánh 'main'.
+on:
+  push:
+    branches:
+      - main  # <-- Nếu bạn dùng 'master', hãy đổi tên ở đây
+
+# Công việc: Danh sách các việc cần làm
+jobs:
+  # Tên công việc (bạn tự đặt)
+  ftp-deploy:
+    # Chọn máy ảo để chạy: bản Ubuntu mới nhất
+    runs-on: ubuntu-latest
+
+    # Các bước chạy
+    steps:
+      # Bước 1: Lấy code từ kho GitHub về máy ảo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Bước 2: Deploy code lên host Somee qua FTP
+      - name: FTP Deploy
+        # Sử dụng Action có sẵn
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          # Lấy thông tin từ 'Secrets' đã tạo ở Bước 2
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+
+          # Thư mục đích trên host Somee
+          # (Rất quan trọng, phải khớp với nơi bạn để file index.php)
+          server-dir: www.thieuw.somee.com/ 
